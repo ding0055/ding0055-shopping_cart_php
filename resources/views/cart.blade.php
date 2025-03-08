@@ -18,32 +18,47 @@
         </div>
     @endif
 
-    <table>
-        <thead>
-        <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Quantity</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach ($cartItems as $item)
+    <form method="POST" action="{{ route('cart.updateAll') }}">
+        @csrf
+        <table>
+            <thead>
             <tr>
-                <td>{{ $item['product_id'] }}</td>
-                <td>${{ number_format($item['price'], 2) }}</td>
-                <td>
-                    <form method="POST" action="{{ route('cart.update', $item['id']) }}" style="display: inline;">
-                        @csrf
-                        <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" style="width: 60px; padding: 5px;">
-                        <button type="submit" class="btn btn-primary">Update</button>
-                    </form>
-                    <a href="{{ route('cart.remove', $item['product_id']) }}" class="btn btn-danger">Remove</a>
-                </td>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Remove</th>
             </tr>
-        @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach ($cartItems as $item)
+                <tr>
+                    <td>{{ $item['product_id'] }}</td>
+                    <td>${{ number_format($item['price'], 2) }}</td>
+                    <td>
+                        <input type="number"
+                               name="quantity[{{ $item['id'] }}]"
+                               value="{{ $item['quantity'] }}"
+                               min="1"
+                               style="width: 60px; padding: 5px;"
+                               onchange="updateSubtotal(this, {{ $item['price'] }})">
+                    </td>
+                    <td class="subtotal">${{ number_format($item['price'] * $item['quantity'], 2) }}</td>
+                    <td>
+                        <a href="{{ route('cart.remove', $item['product_id']) }}" class="btn btn-danger">Remove</a>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
 
+        <!-- Update All Button -->
+        <div class="update-all-container">
+            <button type="submit" class="btn btn-primary">Update Shopping Cart</button>
+        </div>
+    </form>
+
+    <!-- Order Summary -->
     <div class="total-section">
         <h3>Order Summary</h3>
         <p>Subtotal: ${{ number_format($subtotal, 2) }}</p>
@@ -52,15 +67,26 @@
         <p><strong>Grand Total: ${{ number_format($grandTotal, 2) }}</strong></p>
     </div>
 
+    <!-- Add Test Items and Login/Logout Buttons -->
     <div style="text-align: center; margin-top: 20px;">
         <a href="{{ route('cart.addTestItems') }}" class="btn btn-success">Add Test Items</a>
         @if(!Auth::check())
-            <a href="{{ route('cart.simulateLogin') }}" class="btn btn-warning">Simulate Login & Sync Cart</a>
+            <a href="{{ route('cart.simulateLogin') }}" class="btn btn-warning">Simulate Login</a>
         @endif
         @if(Auth::check())
             <a href="{{ route('cart.simulateLogout') }}" class="btn btn-warning">Simulate Logout</a>
         @endif
     </div>
 </div>
+
+<script>
+    // Function to update the subtotal for a single row
+    function updateSubtotal(input, price) {
+        const quantity = input.value;
+        const subtotal = (price * quantity).toFixed(2);
+        const subtotalCell = input.closest('tr').querySelector('.subtotal');
+        subtotalCell.textContent = `$${subtotal}`;
+    }
+</script>
 </body>
 </html>

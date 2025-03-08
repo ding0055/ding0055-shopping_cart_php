@@ -9,3 +9,4 @@ Route::get('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.r
 Route::get('/cart/add-test-items', [CartController::class, 'addTestItems'])->name('cart.addTestItems');
 Route::get('/cart/simulate-login', [CartController::class, 'simulateLogin'])->name('cart.simulateLogin');
 Route::get('/cart/simulate-logout', [CartController::class, 'simulateLogout'])->name('cart.simulateLogout');
+Route::post('/cart/update-all', [CartController::class, 'updateAll'])->name('cart.updateAll');

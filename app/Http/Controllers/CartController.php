@@ -7,7 +7,7 @@ use App\Models\Cart;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Session;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
@@ -114,6 +114,31 @@ class CartController extends Controller
         }
 
         return redirect()->route('cart.index');
+    }
+
+    public function updateAll(Request $request)
+    {
+        $quantities = $request->input('quantity');
+
+        if (Auth::check()) {
+            // Update cart items in the database for authenticated users
+            foreach ($quantities as $id => $quantity) {
+                Cart::where('id', $id)
+                    ->where('user_id', Auth::id())
+                    ->update(['quantity' => (int) $quantity]);
+            }
+        } else {
+            // Update cart items in Redis for guests
+            $cartItems = $this->getCartItems();
+            foreach ($quantities as $id => $quantity) {
+                if (isset($cartItems[$id])) {
+                    $cartItems[$id]['quantity'] = (int) $quantity;
+                }
+            }
+            $this->saveCartItems($cartItems);
+        }
+
+        return redirect()->route('cart.index')->with('message', 'Cart updated successfully!');
     }
 
     public function addTestItems()

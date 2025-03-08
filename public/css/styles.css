@@ -74,6 +74,14 @@ th {
     margin-bottom: 20px;
     text-align: center;
 }
+.subtotal {
+    font-weight: bold;
+    color: #333;
+}
+.update-all-container {
+    text-align: right;
+    margin-bottom: 20px;
+}
 @media (max-width: 600px) {
     .container {
         padding: 10px;
