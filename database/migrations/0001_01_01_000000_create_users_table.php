@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 return new class extends Migration
 {
@@ -35,6 +37,14 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        DB::table('users')->insert([
+            'name' => 'Test User',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'), // 使用 Hash 加密密码
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**
